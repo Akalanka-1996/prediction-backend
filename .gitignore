@@ -5,6 +5,7 @@
 *.pyo
 env/
 venv/
+flask/
 .venv/
 env*
 dist/

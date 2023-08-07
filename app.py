@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, render_template, request
 import flask
 from flask import jsonify
 from flask_cors import CORS, cross_origin
