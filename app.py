@@ -36,11 +36,18 @@ def imagePrediction(img_data, target):
     
     proba = imageModel.predict(np.array([img_array]))
     top_3 = np.argsort(proba[0])[:-4:-1]
+    top_predictions = []
     for i in range(3):
+        prediction = {
+            "class": classes[top_3[i]],
+            "probability": "{:.3}".format(proba[0][top_3[i]])
+        }
+        top_predictions.append(prediction)
         print("{}".format(classes[top_3[i]])+" ({:.3})".format(proba[0][top_3[i]]))
 
     data = {
-            "title": "Prediction Result"
+            "title": "Prediction Result",
+            "predictions": top_predictions
     }
     response = flask.jsonify(data)
 
