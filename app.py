@@ -25,6 +25,7 @@ import random
 import string
 import datetime
 from dotenv import load_dotenv
+from functools import wraps
 
 load_dotenv()
 imageModel = tf.keras.models.load_model("final.h5")
@@ -51,6 +52,13 @@ def create_jwt(user_id):
     token = jwt.encode(payload, app.config["SECRET_KEY"], algorithm="HS256")
     return token
 
+
+def verify_jwt(token):
+    try:
+        payload = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
+        return payload
+    except jwt.ExpiredSignatureError:
+        return None
 
 def imagePrediction(img_data, target):
     npimg = np.fromstring(img_data, np.uint8)
@@ -183,6 +191,40 @@ def login():
         return jsonify({"message": "Login successful", "token": jwt, "user": user_details,}), 200
     else:
         return jsonify({"message": "Invalid password"}), 401
+    
+
+def before_upload_request(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.headers.get("Authorization")
+        if token:
+            token = token.split()[1]  # Remove "Bearer" prefix
+            payload = verify_jwt(token)
+            if payload:
+                current_user = payload["user_id"]
+                return f(current_user, *args, **kwargs)
+        return jsonify({"message": "Unauthorized"}), 401
+    return decorated_function
+
+@app.route("/upload", methods=["POST"])
+@before_upload_request
+def upload_item(current_user):
+    if not current_user:
+        return jsonify({"message": "Unauthorized"}), 401
+
+    data = request.json
+    if not data or "image_url" not in data:
+        return jsonify({"message": "Missing image_url"}), 400
+
+    image_url = data["image_url"]
+    item = {
+        "user_id": current_user,
+        "image_url": image_url
+    }
+
+    mongo.db.items.insert_one(item)
+
+    return jsonify({"message": "Item uploaded successfully"}), 201
     
 
 if __name__ == "__main__":
