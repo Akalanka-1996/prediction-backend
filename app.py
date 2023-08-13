@@ -159,5 +159,31 @@ def register():
     )
 
 
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.json
+
+    if not data or "username" not in data or "password" not in data:
+        return jsonify({"message": "Missing username or password"}), 400
+
+    username = data["username"]
+    password = data["password"]
+
+    user = mongo.db.users.find_one({"username": username})
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    print('user', user)
+    if check_password_hash(user["password"], password):
+        jwt = create_jwt(str(user["user_id"]))
+        user_details = {
+            "user_id": user["user_id"],
+            "username": user["username"],
+            "user_type": user["user_type"]
+        }
+        return jsonify({"message": "Login successful", "token": jwt, "user": user_details,}), 200
+    else:
+        return jsonify({"message": "Invalid password"}), 401
+    
+
 if __name__ == "__main__":
     app.run(port=3001)
