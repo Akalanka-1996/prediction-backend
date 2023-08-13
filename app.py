@@ -9,7 +9,7 @@ import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
 from tensorflow.keras.preprocessing import image as keras_image
-
+from utils.utils import generate_random_user_id, create_jwt, verify_jwt
 # from flask_mongoengine import MongoEngine
 # from flask_mongoengine import MongoEngine
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -36,29 +36,6 @@ app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 mongo = PyMongo(app)
 
-
-def generate_random_user_id():
-    random_suffix = "".join(random.choices(string.digits, k=6))
-    user_id = f"USER{random_suffix}"
-    return user_id
-
-
-def create_jwt(user_id):
-    payload = {
-        "user_id": user_id,
-        "exp": datetime.datetime.utcnow()
-        + datetime.timedelta(days=1),  # Token expiration time
-    }
-    token = jwt.encode(payload, app.config["SECRET_KEY"], algorithm="HS256")
-    return token
-
-
-def verify_jwt(token):
-    try:
-        payload = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
-        return payload
-    except jwt.ExpiredSignatureError:
-        return None
 
 def imagePrediction(img_data, target):
     npimg = np.fromstring(img_data, np.uint8)
