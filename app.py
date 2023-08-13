@@ -24,14 +24,15 @@ import cv2
 import random
 import string
 import datetime
+from dotenv import load_dotenv
 
-
+load_dotenv()
 imageModel = tf.keras.models.load_model("final.h5")
 
 app = Flask(__name__)
 CORS(app)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/prediction"
-app.config["SECRET_KEY"] = "wgTdWV9jtJ7nqQJk" 
+app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 mongo = PyMongo(app)
 
 
