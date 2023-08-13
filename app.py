@@ -202,6 +202,13 @@ def upload_item(current_user):
     mongo.db.items.insert_one(item)
 
     return jsonify({"message": "Item uploaded successfully"}), 201
+
+
+@app.route("/items", methods=["GET"])
+def get_all_items():
+    items = mongo.db.items.find({}, {"_id": 0})  # Exclude _id field from results
+    item_list = list(items)
+    return jsonify(item_list), 200
     
 
 if __name__ == "__main__":
