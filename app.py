@@ -10,6 +10,7 @@ import numpy as np
 from tqdm import tqdm
 from tensorflow.keras.preprocessing import image as keras_image
 from utils.utils import generate_random_user_id, create_jwt, verify_jwt
+
 # from flask_mongoengine import MongoEngine
 # from flask_mongoengine import MongoEngine
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -157,18 +158,27 @@ def login():
     user = mongo.db.users.find_one({"username": username})
     if not user:
         return jsonify({"message": "User not found"}), 404
-    print('user', user)
+    print("user", user)
     if check_password_hash(user["password"], password):
         jwt = create_jwt(str(user["user_id"]))
         user_details = {
             "user_id": user["user_id"],
             "username": user["username"],
-            "user_type": user["user_type"]
+            "user_type": user["user_type"],
         }
-        return jsonify({"message": "Login successful", "token": jwt, "user": user_details,}), 200
+        return (
+            jsonify(
+                {
+                    "message": "Login successful",
+                    "token": jwt,
+                    "user": user_details,
+                }
+            ),
+            200,
+        )
     else:
         return jsonify({"message": "Invalid password"}), 401
-    
+
 
 def before_upload_request(f):
     @wraps(f)
@@ -181,7 +191,9 @@ def before_upload_request(f):
                 current_user = payload["user_id"]
                 return f(current_user, *args, **kwargs)
         return jsonify({"message": "Unauthorized"}), 401
+
     return decorated_function
+
 
 @app.route("/upload", methods=["POST"])
 @before_upload_request
@@ -194,10 +206,8 @@ def upload_item(current_user):
         return jsonify({"message": "Missing image_url"}), 400
 
     image_url = data["image_url"]
-    item = {
-        "user_id": current_user,
-        "image_url": image_url
-    }
+    tags = data.get("tags", [])
+    item = {"user_id": current_user, "image_url": image_url, "tags": tags}
 
     mongo.db.items.insert_one(item)
 
@@ -209,7 +219,7 @@ def get_all_items():
     items = mongo.db.items.find({}, {"_id": 0})  # Exclude _id field from results
     item_list = list(items)
     return jsonify(item_list), 200
-    
+
 
 if __name__ == "__main__":
     app.run(port=3001)
