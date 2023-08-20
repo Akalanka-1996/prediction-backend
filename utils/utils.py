@@ -6,14 +6,6 @@ import datetime
 from dotenv import load_dotenv
 
 
-# load_dotenv()
-
-# app = Flask(__name__)
-# app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
-# app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
-# mongo = PyMongo(app)
-
-
 def generate_random_user_id():
     random_suffix = "".join(random.choices(string.digits, k=6))
     user_id = f"USER{random_suffix}"
