@@ -15,5 +15,5 @@ When an image is given to the model, it outputs the potential demographic factor
 ## Novelty of this Approach
 This research was conducted in the Sri Lankan context and is the first approach of its kind, particularly combining the selection of images with the demographic factors of those who chose the clothing items.
 
-## Thesis
-For more details, refer to my thesis: [Visual Content Usage for Marketing on Demography](https://docs.google.com/document/d/1JRxGm5yhHXSaYrZhFrLP_GSZJS21kwNOr3C3xcirDmM/edit?usp=sharing)
+## In-Depth Analysis and Findings
+For an in-depth exploration of this approach and detailed findings, refer to my thesis: [Visual Content Usage for Marketing on Demography](https://docs.google.com/document/d/1JRxGm5yhHXSaYrZhFrLP_GSZJS21kwNOr3C3xcirDmM/edit?usp=sharing)
